@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Crisp pixel rendering */
+* {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Pixel Art Bevel Borders */
+.pixel-box {
+  border: 4px solid #000;
+  box-shadow: 
+    inset 3px 3px 0px rgba(255, 255, 255, 0.25),
+    inset -3px -3px 0px rgba(0, 0, 0, 0.4),
+    4px 4px 0px #000000;
+}
+
+.pixel-box-pressed {
+  box-shadow: 
+    inset -2px -2px 0px rgba(255, 255, 255, 0.2),
+    inset 2px 2px 0px rgba(0, 0, 0, 0.5),
+    2px 2px 0px #000000;
+}
+
+.pixel-btn {
+  position: relative;
+  border: 3px solid #000;
+  box-shadow: 
+    inset 2px 2px 0px rgba(255, 255, 255, 0.35),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.45),
+    3px 3px 0px #000000;
+  transition: all 0.08s steps(2);
+  user-select: none;
+  cursor: pointer;
+}
+
+.pixel-btn:hover {
+  filter: brightness(1.15);
+  transform: translate(-1px, -1px);
+  box-shadow: 
+    inset 2px 2px 0px rgba(255, 255, 255, 0.45),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.55),
+    4px 4px 0px #000000;
+}
+
+.pixel-btn:active, .pixel-btn.active {
+  transform: translate(2px, 2px);
+  box-shadow: 
+    inset -2px -2px 0px rgba(255, 255, 255, 0.3),
+    inset 2px 2px 0px rgba(0, 0, 0, 0.6),
+    1px 1px 0px #000000;
+}
+
+/* Custom Pixel Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background: #1b1e3f;
+}
+::-webkit-scrollbar-thumb {
+  background: #e98550;
+  border: 3px solid #000;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #f7cd79;
+}
+
+/* Pulsing glow for the pixel sun */
+@keyframes sunGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px #f7cd79, 0 0 20px #e98550;
+  }
+  50% {
+    box-shadow: 0 0 16px #f7cd79, 0 0 35px #e98550;
+  }
+}
+.sun-pulse {
+  animation: sunGlow 3s infinite steps(4);
+}
+
+/* Ambient CRT scanline overlay */
+.scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}

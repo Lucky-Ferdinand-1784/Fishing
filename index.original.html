@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Sunset Horizon - Retro Sidebar & UI</title>
+  <!-- Google Fonts: Press Start 2P & VT323 for authentic retro pixel aesthetic -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pixel: {
+              night: '#131428',
+              navy: '#1b1e3f',
+              darkPurple: '#2d2244',
+              purple: '#513b6b',
+              lavender: '#8a6b8f',
+              duskRose: '#b85b64',
+              sunsetOrange: '#e98550',
+              goldenSun: '#f7cd79',
+              oceanDeep: '#233d54',
+              oceanMid: '#3a6970',
+              sand: '#dfba91'
+            }
+          },
+          fontFamily: {
+            pixel: ['"Press Start 2P"', 'monospace'],
+            retro: ['"VT323"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Crisp pixel rendering */
+    * {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    /* Pixel Art Bevel Borders */
+    .pixel-box {
+      border: 4px solid #000;
+      box-shadow: 
+        inset 3px 3px 0px rgba(255, 255, 255, 0.25),
+        inset -3px -3px 0px rgba(0, 0, 0, 0.4),
+        4px 4px 0px #000000;
+    }
+
+    .pixel-box-pressed {
+      box-shadow: 
+        inset -2px -2px 0px rgba(255, 255, 255, 0.2),
+        inset 2px 2px 0px rgba(0, 0, 0, 0.5),
+        2px 2px 0px #000000;
+    }
+
+    .pixel-btn {
+      position: relative;
+      border: 3px solid #000;
+      box-shadow: 
+        inset 2px 2px 0px rgba(255, 255, 255, 0.35),
+        inset -2px -2px 0px rgba(0, 0, 0, 0.45),
+        3px 3px 0px #000000;
+      transition: all 0.08s steps(2);
+      user-select: none;
+    }
+
+    .pixel-btn:hover {
+      filter: brightness(1.15);
+      transform: translate(-1px, -1px);
+      box-shadow: 
+        inset 2px 2px 0px rgba(255, 255, 255, 0.45),
+        inset -2px -2px 0px rgba(0, 0, 0, 0.55),
+        4px 4px 0px #000000;
+    }
+
+    .pixel-btn:active, .pixel-btn.active {
+      transform: translate(2px, 2px);
+      box-shadow: 
+        inset -2px -2px 0px rgba(255, 255, 255, 0.3),
+        inset 2px 2px 0px rgba(0, 0, 0, 0.6),
+        1px 1px 0px #000000;
+    }
+
+    /* Custom Pixel Scrollbar */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+      background: #1b1e3f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e98550;
+      border: 3px solid #000;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f7cd79;
+    }
+
+    /* Pulsing glow for the pixel sun */
+    @keyframes sunGlow {
+      0%, 100% {
+        box-shadow: 0 0 10px #f7cd79, 0 0 20px #e98550;
+      }
+      50% {
+        box-shadow: 0 0 16px #f7cd79, 0 0 35px #e98550;
+      }
+    }
+    .sun-pulse {
+      animation: sunGlow 3s infinite steps(4);
+    }
+
+    /* Ambient CRT scanline overlay */
+    .scanlines {
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.25) 50%
+      ), linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.03),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 0, 255, 0.03)
+      );
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body class="bg-pixel-night text-amber-100 font-pixel selection:bg-pixel-sunsetOrange selection:text-black min-h-screen flex flex-col overflow-x-hidden antialiased">
+  <!-- Scanline filter overlay for authentic 90s display feeling -->
+  <div class="scanlines fixed inset-0 z-50 pointer-events-none opacity-40"></div>
+
+  <header class="lg:hidden bg-pixel-navy border-b-4 border-black px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+    <div class="flex items-center gap-3">
+      <div class="w-6 h-6 rounded-full bg-pixel-goldenSun border-2 border-black sun-pulse"></div>
+      <span class="text-xs text-pixel-goldenSun tracking-wider">SUNSET HORIZON</span>
+    </div>
+    <button id="mobile-toggle" onclick="toggleSidebar()" class="pixel-btn bg-pixel-duskRose text-white px-3 py-1.5 text-xs flex items-center gap-2">
+      <span id="menu-icon">☰ MENU</span>
+    </button>
+  </header>
+
+  <div class="flex-1 flex relative overflow-hidden">
+    <aside id="main-sidebar" class="fixed lg:static top-0 left-0 bottom-0 z-40 w-72 bg-pixel-navy border-r-4 border-black flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-150 ease-out">
+      <!-- Top Section: Logo & User Badge -->
+      <div class="p-4 space-y-4 overflow-y-auto">
+        <!-- Brand / Header -->
+        <div class="pixel-box bg-pixel-darkPurple p-3 text-center border-pixel-purple">
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <div class="w-7 h-7 bg-pixel-goldenSun border-2 border-black rounded-none sun-pulse flex items-center justify-center">
+              <div class="w-3 h-3 bg-pixel-sunsetOrange"></div>
+            </div>
+            <h1 class="text-sm font-bold tracking-tight text-pixel-goldenSun">SUNSET HORIZON</h1>
+          </div>
+          <p class="font-retro text-lg text-pixel-lavender tracking-widest uppercase">~ Retro Seaside OS ~</p>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="pixel-box bg-[#15172e] p-3 flex items-center gap-3">
+          <!-- Pixel Avatar -->
+          <div class="w-12 h-12 bg-pixel-purple border-2 border-black flex-shrink-0 flex items-center justify-center text-xl shadow-[inset_2px_2px_0px_#fff3]">
+            🏄‍♂️
+          </div>
+          <div class="overflow-hidden">
+            <div class="text-[10px] text-pixel-goldenSun truncate">CAPTAIN_WAVE</div>
+            <div class="font-retro text-base text-emerald-400 flex items-center gap-1">
+              <span class="w-2 h-2 inline-block bg-emerald-400 border border-black animate-ping"></span>
+              ONLINE • LVL 26
+            </div>
+          </div>
+        </div>
+
+        <nav class="space-y-2 pt-2">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item pixel-btn active w-full text-left p-3 text-[11px] bg-pixel-sunsetOrange text-black font-bold flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="indicator font-mono">▶</span> 
+              <span>DASHBOARD</span>
+            </span>
+            <span class="font-retro text-lg bg-black text-pixel-goldenSun px-1.5 border border-black">01</span>
+          </button>
+
+          <button onclick="switchTab('palette')" id="nav-palette" class="nav-item pixel-btn w-full text-left p-3 text-[11px] bg-pixel-darkPurple text-pixel-sand flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="indicator font-mono opacity-0">▶</span> 
+              <span>COLOR PALETTE</span>
+            </span>
+            <span class="font-retro text-lg bg-black text-pixel-goldenSun px-1.5 border border-black">02</span>
+          </button>
+
+          <button onclick="switchTab('csscode')" id="nav-csscode" class="nav-item pixel-btn w-full text-left p-3 text-[11px] bg-pixel-darkPurple text-pixel-sand flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="indicator font-mono opacity-0">▶</span> 
+              <span>SIDEBAR CODE</span>
+            </span>
+            <span class="font-retro text-lg bg-black text-pixel-goldenSun px-1.5 border border-black">03</span>
+          </button>
+
+          <button onclick="switchTab('notes')" id="nav-notes" class="nav-item pixel-btn w-full text-left p-3 text-[11px] bg-pixel-darkPurple text-pixel-sand flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="indicator font-mono opacity-0">▶</span> 
+              <span>QUEST NOTES</span>
+            </span>
+            <span class="font-retro text-lg bg-black text-pixel-goldenSun px-1.5 border border-black">04</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="p-3 border-t-4 border-black bg-[#101222]">
+        <div class="pixel-box bg-pixel-navy p-3 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] text-pixel-goldenSun flex items-center gap-1">
+              <span id="audio-disc" class="inline-block">💿</span> LO-FI CHILL
+            </span>
+            <span id="player-status" class="font-retro text-sm text-pixel-lavender">READY</span>
+          </div>
+
+          <!-- Track name marquee effect -->
+          <div class="bg-black p-1.5 border-2 border-[#333] overflow-hidden">
+            <div id="track-name" class="text-[10px] text-amber-300 whitespace-nowrap animate-pulse">
+              ♫ Evening Breeze.wav
+            </div>
+          </div>
+
+          <!-- Retro Sound Progress Bar -->
+          <div class="w-full bg-black h-3 border-2 border-black relative cursor-pointer" onclick="clickProgressBar(event)">
+            <div id="audio-progress" class="h-full bg-gradient-to-r from-pixel-duskRose to-pixel-sunsetOrange w-0 transition-all duration-300"></div>
+          </div>
+
+          <!-- Player Controls -->
+          <div class="flex items-center justify-between gap-1 pt-1">
+            <button onclick="toggleAudio()" id="play-btn" class="pixel-btn flex-1 bg-pixel-sunsetOrange text-black py-1.5 text-[10px] font-bold text-center">
+              ▶ PLAY
+            </button>
+            <button onclick="cycleAmbientTrack()" class="pixel-btn bg-pixel-purple text-white px-2.5 py-1.5 text-[10px]" title="Next Track">
+              ⏭
+            </button>
+            <button onclick="toggleMute()" id="mute-btn" class="pixel-btn bg-pixel-darkPurple text-white px-2.5 py-1.5 text-[10px]" title="Audio Mute">
+              🔊
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay when mobile sidebar is open -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/70 z-30 hidden lg:hidden"></div>
+
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto space-y-6">
+      
+      <!-- HERO: Pixel Sunset Showcase -->
+      <section class="pixel-box bg-pixel-navy p-4 md:p-6 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 border-b-2 border-pixel-purple pb-3">
+          <div>
+            <div class="text-[10px] text-pixel-sunsetOrange uppercase tracking-widest">Pixel Art Scenic View</div>
+            <h2 class="text-base md:text-xl text-pixel-goldenSun mt-1">SUNSET HARBOR BEACH</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="playChime()" class="pixel-btn bg-pixel-duskRose hover:bg-pixel-sunsetOrange text-white text-[10px] px-3 py-2">
+              🔔 SOUND CHECK
+            </button>
+            <span class="pixel-box bg-pixel-darkPurple text-[10px] px-2.5 py-1.5 text-pixel-sand">
+              FPS: 60
+            </span>
+          </div>
+        </div>
+
+        <!-- The Scenic Pixel Sun Art Illustration generated with pure CSS & Canvas/SVG styling -->
+        <div class="relative w-full rounded-none border-4 border-black overflow-hidden shadow-[0_6px_0_#000]">
+          <!-- Pixel Canvas Container -->
+          <div class="relative h-64 md:h-80 w-full overflow-hidden bg-gradient-to-b from-[#1b1e3f] via-[#513b6b] via-[#b85b64] via-[#e98550] to-[#233d54] flex flex-col justify-end">
+            
+            <!-- Mountain Silhouette -->
+            <div class="absolute inset-0 opacity-40">
+              <!-- Pixelated Star dots -->
+              <div class="absolute top-4 left-10 w-1.5 h-1.5 bg-white"></div>
+              <div class="absolute top-8 left-1/3 w-1 h-1 bg-amber-200"></div>
+              <div class="absolute top-6 right-20 w-1.5 h-1.5 bg-white"></div>
+              <div class="absolute top-14 right-1/3 w-1 h-1 bg-amber-100"></div>
+            </div>
+
+            <!-- Sun Glow & Horizon -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/3 text-center">
+              <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-t from-pixel-sunsetOrange to-pixel-goldenSun border-4 border-black sun-pulse mx-auto"></div>
+            </div>
+
+            <!-- Pixel Clouds -->
+            <div class="absolute top-12 left-6 flex space-x-2 opacity-80 animate-pulse">
+              <div class="w-16 h-4 bg-pixel-lavender border-2 border-black"></div>
+              <div class="w-24 h-4 bg-pixel-duskRose border-2 border-black -ml-4 mt-2"></div>
+            </div>
+
+            <div class="absolute top-16 right-10 flex space-x-1 opacity-80">
+              <div class="w-20 h-4 bg-pixel-duskRose border-2 border-black"></div>
+              <div class="w-12 h-3 bg-pixel-lavender border-2 border-black -ml-3 mt-2"></div>
+            </div>
+
+            <!-- Sea & Ocean Reflection -->
+            <div class="relative z-10 h-28 bg-gradient-to-b from-[#25395c] via-[#244f63] to-[#122230] border-t-4 border-black">
+              <!-- Animated ocean wave glistening lines -->
+              <div class="space-y-2 p-2">
+                <div class="mx-auto w-40 h-1 bg-pixel-goldenSun opacity-90"></div>
+                <div class="mx-auto w-56 h-1 bg-pixel-sunsetOrange opacity-75"></div>
+                <div class="mx-auto w-72 h-1 bg-pixel-duskRose opacity-60"></div>
+                <div class="mx-auto w-96 h-1.5 bg-pixel-oceanMid opacity-50"></div>
+              </div>
+
+              <!-- Pixel Palm Tree Silhouettes (Left & Right) -->
+              <div class="absolute -bottom-2 left-3 text-4xl select-none filter brightness-50">
+                🌴🌴
+              </div>
+              <div class="absolute -bottom-2 right-4 text-4xl select-none filter brightness-50">
+                🌴
+              </div>
+
+              <!-- Retro Boat -->
+              <div class="absolute top-4 left-1/4 text-xl animate-bounce" style="animation-duration: 4s;">
+                ⛵
+              </div>
+            </div>
+
+            <!-- Beach Sand Foreground -->
+            <div class="relative z-10 h-8 bg-pixel-sand border-t-2 border-black flex items-center justify-between px-6 text-[10px] text-stone-800 font-bold">
+              <span>░░ BEACH SHORELINE ░░</span>
+              <span>🌊 CALM TIDE</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+      <!-- VIEW 1: DASHBOARD TILES -->
+      <div id="view-dashboard" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Card 1: Sunset Status -->
+          <div class="pixel-box bg-pixel-darkPurple p-4">
+            <div class="flex items-center justify-between text-xs text-pixel-goldenSun mb-2">
+              <span>WAKTU SENJA</span>
+              <span>17:48 WIB</span>
+            </div>
+            <p class="font-retro text-2xl text-white">Matahari terbenam sempurna dengan semburat jingga dan ungu.</p>
+            <div class="mt-3 text-[10px] text-pixel-sand bg-black/40 p-2 border border-black">
+              Suhu: 27°C • Angin Sejuk Pantai
+            </div>
+          </div>
+
+          <!-- Card 2: Audio Lo-Fi Vibe -->
+          <div class="pixel-box bg-pixel-navy p-4">
+            <div class="flex items-center justify-between text-xs text-pixel-sunsetOrange mb-2">
+              <span>ATMOSPHERE</span>
+              <span class="animate-pulse">● LIVE</span>
+            </div>
+            <p class="font-retro text-2xl text-pixel-sand">Synth Ombak & Akord Nostalgia 8-bit.</p>
+            <button onclick="toggleAudio()" class="mt-3 w-full pixel-btn bg-pixel-duskRose text-white text-[10px] py-2">
+              🔊 AKTIFKAN SUARA OMBAK
+            </button>
+          </div>
+
+          <!-- Card 3: Integrasi Cepat -->
+          <div class="pixel-box bg-[#1b2b3a] p-4">
+            <div class="flex items-center justify-between text-xs text-emerald-400 mb-2">
+              <span>REUSABILITY</span>
+              <span>HTML / CSS</span>
+            </div>
+            <p class="font-retro text-2xl text-emerald-200">Sidebar siap dipasang langsung ke websitemu!</p>
+            <button onclick="switchTab('csscode')" class="mt-3 w-full pixel-btn bg-pixel-goldenSun text-black text-[10px] py-2 font-bold">
+              📋 LIHAT KODE SIDEBAR
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: PALETTE INSPECTOR -->
+      <div id="view-palette" class="hidden space-y-4">
+        <div class="pixel-box bg-pixel-navy p-4">
+          <h3 class="text-sm text-pixel-goldenSun mb-2">PALET WARNA RESMI BACKGROUND MATAHARI TERBENAM</h3>
+          <p class="font-retro text-xl text-pixel-sand mb-4">Warna-warna ini diekstrak langsung dari pemandangan senja pantai:</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+            <!-- Palette item 1 -->
+            <div onclick="copyHex('#1C2341')" class="pixel-btn bg-[#1C2341] p-3 text-center cursor-pointer">
+              <div class="h-10 border-2 border-black mb-2 bg-[#1C2341]"></div>
+              <div class="text-[10px] text-white">#1C2341</div>
+              <div class="font-retro text-sm text-gray-300">Night Navy</div>
+            </div>
+            <!-- Palette item 2 -->
+            <div onclick="copyHex('#513B6B')" class="pixel-btn bg-[#513B6B] p-3 text-center cursor-pointer">
+              <div class="h-10 border-2 border-black mb-2 bg-[#513B6B]"></div>
+              <div class="text-[10px] text-white">#513B6B</div>
+              <div class="font-retro text-sm text-gray-200">Dusk Violet</div>
+            </div>
+            <!-- Palette item 3 -->
+            <div onclick="copyHex('#B85B64')" class="pixel-btn bg-[#B85B64] p-3 text-center cursor-pointer">
+              <div class="h-10 border-2 border-black mb-2 bg-[#B85B64]"></div>
+              <div class="text-[10px] text-white">#B85B64</div>
+              <div class="font-retro text-sm text-amber-100">Rose Coral</div>
+            </div>
+            <!-- Palette item 4 -->
+            <div onclick="copyHex('#E98550')" class="pixel-btn bg-[#E98550] p-3 text-center cursor-pointer">
+              <div class="h-10 border-2 border-black mb-2 bg-[#E98550]"></div>
+              <div class="text-[10px] text-black font-bold">#E98550</div>
+              <div class="font-retro text-sm text-black">Sunset Glow</div>
+            </div>
+            <!-- Palette item 5 -->
+            <div onclick="copyHex('#F7CD79')" class="pixel-btn bg-[#F7CD79] p-3 text-center cursor-pointer">
+              <div class="h-10 border-2 border-black mb-2 bg-[#F7CD79]"></div>
+              <div class="text-[10px] text-black font-bold">#F7CD79</div>
+              <div class="font-retro text-sm text-black">Sun Gold</div>
+            </div>
+            <!-- Palette item 6 -->
+            <div onclick="copyHex('#DFBA91')" class="pixel-btn bg-[#DFBA91] p-3 text-center cursor-pointer">
+              <div class="h-10 border-2 border-black mb-2 bg-[#DFBA91]"></div>
+              <div class="text-[10px] text-black font-bold">#DFBA91</div>
+              <div class="font-retro text-sm text-black">Warm Sand</div>
+            </div>
+          </div>
+          <div id="palette-toast" class="mt-3 text-[10px] text-emerald-400 font-retro text-lg text-center hidden">
+            ✓ Hex code berhasil disalin ke clipboard!
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 3: CSS / HTML CODE EXPORT -->
+      <div id="view-csscode" class="hidden space-y-4">
+        <div class="pixel-box bg-pixel-navy p-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <div>
+              <h3 class="text-sm text-pixel-goldenSun">KODE CSS & STRUKTUR SIDEBAR RETRO</h3>
+              <p class="font-retro text-lg text-pixel-sand">Salin kode ini untuk langsung dipakai di project websitemu.</p>
+            </div>
+            <button onclick="copySidebarCSS()" id="copy-code-btn" class="pixel-btn bg-pixel-sunsetOrange text-black font-bold text-[10px] px-3 py-2">
+              📋 SALIN KODE
+            </button>
+          </div>
+
+          <div class="relative bg-black p-3 border-4 border-black text-emerald-400 font-mono text-xs overflow-x-auto max-h-96">
+            <pre id="code-snippet"><code>/* === PALET RETRO SUNSET === */
+:root {
+  --bg-night: #1b1e3f;
+  --sunset-orange: #e98550;
+  --sunset-gold: #f7cd79;
+  --dusk-purple: #513b6b;
+  --sand-beige: #dfba91;
+}
+
+/* === BORDER PIXEL ART SHADOW === */
+.retro-sidebar {
+  width: 280px;
+  background-color: var(--bg-night);
+  border-right: 4px solid #000;
+  color: var(--sand-beige);
+  font-family: 'Press Start 2P', monospace;
+  box-shadow: 4px 0 0 #000;
+}
+
+.pixel-nav-button {
+  border: 3px solid #000;
+  background: var(--dusk-purple);
+  color: #fff;
+  padding: 10px 14px;
+  box-shadow: 
+    inset 2px 2px 0px rgba(255,255,255,0.3),
+    inset -2px -2px 0px rgba(0,0,0,0.5),
+    3px 3px 0px #000;
+  transition: all 0.08s steps(2);
+  cursor: pointer;
+}
+
+.pixel-nav-button:hover {
+  background: var(--sunset-orange);
+  color: #000;
+  transform: translate(-1px, -1px);
+}
+
+.pixel-nav-button:active,
+.pixel-nav-button.active {
+  transform: translate(2px, 2px);
+  box-shadow: 
+    inset -2px -2px 0px rgba(255,255,255,0.2),
+    inset 2px 2px 0px rgba(0,0,0,0.6),
+    1px 1px 0px #000;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 4: QUEST NOTES -->
+      <div id="view-notes" class="hidden space-y-4">
+        <div class="pixel-box bg-pixel-darkPurple p-4">
+          <h3 class="text-sm text-pixel-goldenSun mb-3">CATATAN PENGEMBANGAN WEBSITE (QUEST LOG)</h3>
+          
+          <div class="space-y-3 font-retro text-xl">
+            <div class="pixel-box bg-[#1c1d35] p-3 flex items-start gap-3">
+              <span class="text-emerald-400">✓</span>
+              <div>
+                <div class="text-white font-pixel text-xs">Desain Background Matahari Terbenam</div>
+                <div class="text-pixel-lavender">Pemandangan pantai senja dengan gradasi oranye, ungu, tebing dan siluet pohon kelapa selesai.</div>
+              </div>
+            </div>
+
+            <div class="pixel-box bg-[#1c1d35] p-3 flex items-start gap-3">
+              <span class="text-emerald-400">✓</span>
+              <div>
+                <div class="text-white font-pixel text-xs">Sidebar Selaras Palet Senja</div>
+                <div class="text-pixel-lavender">Elemen navigasi dengan tombol tebal, efek klik 8-bit, dan widget pemutar audio lo-fi.</div>
+              </div>
+            </div>
+
+            <div class="pixel-box bg-[#1c1d35] p-3 flex items-start gap-3">
+              <span class="text-pixel-goldenSun">▶</span>
+              <div>
+                <div class="text-white font-pixel text-xs">Integrasi Konten Tambahan</div>
+                <div class="text-pixel-lavender">Menambahkan galeri portofolio atau form kontak dengan gaya RPG klasik.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="global-toast" class="fixed bottom-5 right-5 z-50 pixel-box bg-pixel-goldenSun text-black px-4 py-2 text-xs font-bold hidden transition-opacity duration-200">
+        Notification text
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // State management
+    let audioPlaying = false;
+    let isMuted = false;
+    let audioCtx = null;
+    let ambientGain = null;
+    let oscillatorNodes = [];
+    let progressTimer = null;
+    let progressValue = 0;
+
+    // Mobile sidebar toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('main-sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const isClosed = sidebar.classList.contains('-translate-x-full');
+      
+      playBeep(440, 0.05);
+
+      if (isClosed) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // Tab switcher
+    function switchTab(tabId) {
+      playBeep(520, 0.04);
+      
+      // Update navigation button active styles
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('active', 'bg-pixel-sunsetOrange', 'text-black');
+        btn.classList.add('bg-pixel-darkPurple', 'text-pixel-sand');
+        const ind = btn.querySelector('.indicator');
+        if (ind) ind.classList.add('opacity-0');
+      });
+
+      const activeBtn = document.getElementById(`nav-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'bg-pixel-sunsetOrange', 'text-black');
+        activeBtn.classList.remove('bg-pixel-darkPurple', 'text-pixel-sand');
+        const ind = activeBtn.querySelector('.indicator');
+        if (ind) ind.classList.remove('opacity-0');
+      }
+
+      // Hide all views
+      ['dashboard', 'palette', 'csscode', 'notes'].forEach(id => {
+        const el = document.getElementById(`view-${id}`);
+        if (el) el.classList.add('hidden');
+      });
+
+      // Show selected view
+      const targetView = document.getElementById(`view-${tabId}`);
+      if (targetView) targetView.classList.remove('hidden');
+
+      // Close mobile drawer if opened
+      if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('main-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // Audio synthesizer using Web Audio API for retro lo-fi chords & wave noise
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        ambientGain = audioCtx.createGain();
+        ambientGain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        ambientGain.connect(audioCtx.destination);
+      }
+    }
+
+    function toggleAudio() {
+      initAudio();
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const playBtn = document.getElementById('play-btn');
+      const statusLabel = document.getElementById('player-status');
+      const disc = document.getElementById('audio-disc');
+
+      if (!audioPlaying) {
+        startLoFiChords();
+        audioPlaying = true;
+        playBtn.innerText = '⏸ PAUSE';
+        playBtn.classList.replace('bg-pixel-sunsetOrange', 'bg-pixel-goldenSun');
+        statusLabel.innerText = 'PLAYING';
+        statusLabel.classList.add('text-emerald-400');
+        disc.classList.add('animate-spin');
+        startProgress();
+        showToast('🎵 Lo-Fi Sunset Waves Dimainkan!');
+      } else {
+        stopLoFiChords();
+        audioPlaying = false;
+        playBtn.innerText = '▶ PLAY';
+        playBtn.classList.replace('bg-pixel-goldenSun', 'bg-pixel-sunsetOrange');
+        statusLabel.innerText = 'PAUSED';
+        statusLabel.classList.remove('text-emerald-400');
+        disc.classList.remove('animate-spin');
+        clearInterval(progressTimer);
+        showToast('⏸ Audio Dijeda');
+      }
+    }
+
+    function startLoFiChords() {
+      if (!audioCtx) return;
+      stopLoFiChords();
+
+      // Relaxing warm chord: Fmaj7 / C
+      const freqs = [174.61, 220.00, 261.63, 329.63];
+      oscillatorNodes = freqs.map((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        // Gentle tremolo lofi modulation
+        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        osc.connect(gain);
+        gain.connect(ambientGain);
+        osc.start();
+        return { osc, gain };
+      });
+    }
+
+    function stopLoFiChords() {
+      oscillatorNodes.forEach(item => {
+        try {
+          item.osc.stop();
+          item.osc.disconnect();
+        } catch(e) {}
+      });
+      oscillatorNodes = [];
+    }
+
+    function toggleMute() {
+      initAudio();
+      isMuted = !isMuted;
+      const muteBtn = document.getElementById('mute-btn');
+      if (ambientGain) {
+        ambientGain.gain.setValueAtTime(isMuted ? 0 : 0.08, audioCtx.currentTime);
+      }
+      muteBtn.innerText = isMuted ? '🔇' : '🔊';
+      showToast(isMuted ? 'Suara Dimatikan' : 'Suara Dinyalakan');
+    }
+
+    function playBeep(freq = 600, duration = 0.05) {
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playChime() {
+      playBeep(440, 0.08);
+      setTimeout(() => playBeep(554.37, 0.08), 80);
+      setTimeout(() => playBeep(659.25, 0.15), 160);
+      showToast('✨ 8-Bit Sunset Chime!');
+    }
+
+    function cycleAmbientTrack() {
+      playBeep(700, 0.05);
+      const tracks = [
+        "♫ Evening Breeze.wav",
+        "♫ Seaside Campfire.wav",
+        "♫ Dusk Horizon Lo-Fi.wav"
+      ];
+      const trackEl = document.getElementById('track-name');
+      const currentIndex = tracks.indexOf(trackEl.innerText.trim());
+      const nextIndex = (currentIndex + 1) % tracks.length;
+      trackEl.innerText = tracks[nextIndex];
+      showToast(`Memutar: ${tracks[nextIndex]}`);
+    }
+
+    function startProgress() {
+      clearInterval(progressTimer);
+      progressTimer = setInterval(() => {
+        progressValue = (progressValue + 1) % 100;
+        document.getElementById('audio-progress').style.width = progressValue + '%';
+      }, 400);
+    }
+
+    function clickProgressBar(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      progressValue = Math.min(100, Math.max(0, Math.round((clickX / rect.width) * 100)));
+      document.getElementById('audio-progress').style.width = progressValue + '%';
+      playBeep(350, 0.04);
+    }
+
+    // Copy Hex code helper
+    function copyHex(hex) {
+      playBeep(650, 0.04);
+      copyToClipboard(hex);
+      showToast(`Tersalin: ${hex}`);
+    }
+
+    // Copy CSS Snippet
+    function copySidebarCSS() {
+      playBeep(700, 0.05);
+      const code = document.getElementById('code-snippet').innerText;
+      copyToClipboard(code);
+      showToast('✓ Kode CSS Sidebar Berhasil Disalin!');
+    }
+
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {}
+      document.body.removeChild(textarea);
+    }
+
+    // Retro Toast notification
+    function showToast(msg) {
+      const toast = document.getElementById('global-toast');
+      toast.innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2200);
+    }
+  </script>
+</body>
+</html>
